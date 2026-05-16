@@ -1,0 +1,66 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.igoy86.nexttranslate"
+    compileSdkVersion 36
+
+    defaultConfig {
+        applicationId "com.igoy86.nexttranslate"
+        minSdkVersion 29
+        targetSdkVersion 35
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        viewBinding true
+		buildConfig true
+    }
+}
+
+dependencies {
+    // AndroidX Core
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.core
+    implementation libs.androidx.constraintlayout
+    implementation libs.androidx.recyclerview
+    implementation libs.androidx.fragment
+    implementation libs.androidx.splashscreen
+
+    // Material
+    implementation libs.material
+
+    // Lifecycle
+    implementation libs.androidx.lifecycle.viewmodel
+    implementation libs.androidx.lifecycle.livedata
+    implementation libs.androidx.lifecycle.common
+
+    // Room
+    implementation libs.androidx.room.runtime
+    annotationProcessor libs.androidx.room.compiler
+
+    // ML Kit
+    implementation libs.mlkit.translate
+    implementation libs.mlkit.langid
+	
+	// Shimmer
+    implementation libs.shimmer
+
+    // Testing
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.test.junit
+    androidTestImplementation libs.androidx.test.espresso
+}

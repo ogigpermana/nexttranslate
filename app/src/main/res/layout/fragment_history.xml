@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_history.xml
+    Layout for the translation history screen (HistoryFragment).
+
+    View ID contract (referenced by HistoryFragment.java):
+      - toolbar              : Back navigation + "History" title + clear button
+      - recyclerViewHistory  : List of past translation entries
+      - layoutEmptyState     : Shown when history list is empty
+      - buttonClearHistory   : Triggers clear-all confirmation dialog
+
+    Empty state visibility is toggled programmatically in HistoryFragment:
+      - layoutEmptyState  VISIBLE  + recyclerViewHistory GONE  → list is empty
+      - layoutEmptyState  GONE     + recyclerViewHistory VISIBLE → list has items
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    tools:context=".presentation.history.HistoryFragment">
+
+    <!-- ======================================================================
+         Top App Bar
+         ====================================================================== -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorSurface"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationContentDescription="@string/cd_navigate_back"
+            app:title="@string/title_history"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ======================================================================
+         Content area — RecyclerView OR Empty State (mutually exclusive)
+         ====================================================================== -->
+
+    <!--
+        History RecyclerView.
+        Visible when historyList is non-empty.
+        Hidden (GONE) when list is empty to avoid overlap with empty state.
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewHistory"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="80dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_history"
+        tools:itemCount="6" />
+
+    <!--
+        Empty state container.
+        Centered vertically and horizontally.
+        Visible (VISIBLE) when history list is empty.
+    -->
+    <LinearLayout
+        android:id="@+id/layoutEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:visibility="visible">
+
+        <!-- Empty state icon -->
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/ic_history"
+            android:alpha="0.4"
+            android:layout_marginBottom="16dp"
+            app:tint="?attr/colorOnSurfaceVariant"
+            android:contentDescription="@null" />
+
+        <!-- Empty state title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_history_title"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Empty state subtitle -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_history_subtitle"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.4" />
+
+    </LinearLayout>
+
+    <!-- ======================================================================
+         Clear All FAB — anchored to bottom
+         Triggers showClearHistoryConfirmDialog() in HistoryFragment
+         Only meaningful when list is non-empty; Fragment handles enabled state
+         ====================================================================== -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonClearHistory"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="16dp"
+        android:text="@string/action_clear_history"
+        app:icon="@drawable/ic_delete_sweep" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

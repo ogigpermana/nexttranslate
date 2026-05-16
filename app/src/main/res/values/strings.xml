@@ -1,0 +1,56 @@
+<resources>
+    <!-- App name -->
+    <string name="app_name">NextTranslate</string>
+
+    <!-- ======================================================
+         fragment_translate.xml
+         ====================================================== -->
+    <string name="hint_enter_text">Enter text to translate</string>
+    <string name="hint_translation_result">Translation will appear here</string>
+    <string name="action_translate">Translate</string>
+    <string name="cd_copy_result">Copy result</string>
+    <string name="cd_add_favorite">Add to favorites</string>
+
+    <!-- ======================================================
+         fragment_history.xml
+         ====================================================== -->
+    <string name="title_history">History</string>
+    <string name="empty_history_title">No history yet</string>
+    <string name="empty_history_subtitle">Your recent translations will appear here</string>
+    <string name="action_clear_history">Clear All</string>
+
+    <!-- ======================================================
+         fragment_favorite.xml
+         ====================================================== -->
+    <string name="title_favorite">Favorites</string>
+    <string name="empty_favorite_title">No favorites yet</string>
+    <string name="empty_favorite_subtitle">Tap the bookmark icon after translating to save it here</string>
+
+    <!-- ======================================================
+         fragment_language.xml
+         ====================================================== -->
+    <string name="title_language_manager">Language Manager</string>
+    <string name="loading_languages">Loading languages…</string>
+
+    <!-- ======================================================
+         item_history.xml
+         ====================================================== -->
+    <string name="cd_delete_history_item">Delete history item</string>
+
+    <!-- ======================================================
+         item_favorite.xml
+         ====================================================== -->
+    <string name="cd_delete_favorite_item">Delete favorite item</string>
+
+    <!-- ======================================================
+         item_language.xml
+         ====================================================== -->
+    <string name="action_download">Download</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- ======================================================
+         Shared / common strings
+         ====================================================== -->
+    <string name="cd_navigate_back">Navigate back</string>
+
+</resources>

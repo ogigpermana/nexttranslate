@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_main.xml
+    Root layout for MainActivity — the single host Activity of NextTranslate.
+
+    Architecture note:
+    This app uses a single-Activity architecture. All screens (TranslateFragment,
+    HistoryFragment, FavoriteFragment, LanguageFragment) are loaded into this
+    FrameLayout container via FragmentManager transactions in MainActivity.java.
+
+    Why FrameLayout?
+    A plain FrameLayout is intentional here — it acts as a neutral container
+    for fragment transactions. Toolbar, AppBar, BottomNav, and Snackbar
+    are each managed independently inside their respective Fragments,
+    keeping this host Activity as thin as possible.
+
+    Fragment loading order:
+      1. TranslateFragment  — loaded on fresh launch (root, not back-stacked)
+      2. HistoryFragment    — pushed via MainActivity.openHistoryFragment()
+      3. FavoriteFragment   — pushed via MainActivity.openFavoriteFragment()
+      4. LanguageFragment   — pushed via MainActivity.openLanguageFragment()
+-->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true" />

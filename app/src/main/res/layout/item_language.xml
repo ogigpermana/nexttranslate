@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_language.xml
+    Layout for a single language model entry in the RecyclerView
+    (used by LanguageAdapter.LanguageViewHolder).
+
+    View ID contract (referenced by LanguageAdapter.java):
+      - textViewLanguageName   : Display name of the language e.g. "Indonesian"
+      - textViewLanguageCode   : BCP-47 code in uppercase e.g. "ID"
+      - buttonDownload         : Shown when model is NOT downloaded and not active
+      - buttonDelete           : Shown when model IS downloaded and not active
+      - progressBar            : Circular indeterminate — shown briefly at download start
+                                 before total size is known, and during delete
+      - layoutDownloadProgress : Container shown during active download with known progress
+      - textViewDownloadMb     : e.g. "14,08 MB / 57,11 MB"
+      - progressBarDownload    : Horizontal determinate progress bar (0–100)
+      - imageViewDefaultCheck  : Checkmark icon for built-in default languages (e.g. English)
+                                 that cannot be deleted. Visibility GONE by default.
+
+    Visibility logic (handled in LanguageAdapter.LanguageViewHolder.bind()):
+      isDefault                → imageViewDefaultCheck VISIBLE, others GONE
+      isActive + progress known  → layoutDownloadProgress VISIBLE, others GONE
+      isActive + no progress     → progressBar VISIBLE, others GONE
+      not active + isDownloaded  → buttonDelete VISIBLE, others GONE
+      not active + not downloaded→ buttonDownload VISIBLE, others GONE
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="4dp"
+    app:cardElevation="0dp"
+    app:cardCornerRadius="12dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:cardBackgroundColor="?attr/colorSurface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
+
+        <!-- ======================================================
+             Language info — name + BCP-47 code
+             ====================================================== -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Language display name e.g. "Indonesian" -->
+            <TextView
+                android:id="@+id/textViewLanguageName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                android:textColor="?attr/colorOnSurface"
+                tools:text="Indonesian" />
+
+            <!-- BCP-47 code e.g. "ID" -->
+            <TextView
+                android:id="@+id/textViewLanguageCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginTop="2dp"
+                tools:text="ID" />
+
+            <!-- ======================================================
+                 Download progress — shown only during active download
+                 with known byte count. Hidden otherwise.
+                 ====================================================== -->
+            <LinearLayout
+                android:id="@+id/layoutDownloadProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="6dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!-- e.g. "14,08 MB / 57,11 MB" -->
+                <TextView
+                    android:id="@+id/textViewDownloadMb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                    android:textColor="?attr/colorPrimary"
+                    android:layout_marginBottom="4dp"
+                    tools:text="14,08 MB / 57,11 MB" />
+
+                <!-- Horizontal determinate progress bar -->
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progressBarDownload"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="false"
+                    app:trackThickness="4dp"
+                    app:indicatorColor="?attr/colorPrimary"
+                    app:trackColor="?attr/colorSurfaceVariant"
+                    app:trackCornerRadius="2dp"
+                    android:progress="0"
+                    android:max="100" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ======================================================
+             Action area — download / delete / circular spinner /
+             default checkmark.
+             Exactly one of these four is visible at a time.
+             ====================================================== -->
+
+        <!--
+            Download button.
+            Visible when model is not yet downloaded and no operation is active.
+        -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonDownload"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/action_download"
+            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+            app:icon="@drawable/ic_download"
+            app:iconSize="18dp"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <!--
+            Delete button.
+            Visible when model is already downloaded and no operation is active.
+        -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonDelete"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/action_delete"
+            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+            app:icon="@drawable/ic_delete_outline"
+            app:iconSize="18dp"
+            app:backgroundTint="?attr/colorErrorContainer"
+            app:iconTint="?attr/colorOnErrorContainer"
+            android:textColor="?attr/colorOnErrorContainer"
+            android:visibility="gone"
+            tools:visibility="gone" />
+
+        <!--
+            Circular indeterminate spinner.
+            Shown at download start (before total size known) and during delete.
+        -->
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressBar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="8dp"
+            app:indicatorSize="32dp"
+            app:trackThickness="3dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            tools:visibility="gone" />
+
+        <!--
+            Default language checkmark.
+            Visible only for built-in languages that cannot be deleted (e.g. English).
+            Matches Google Translate's UX where the default language shows a filled
+            checkmark circle instead of a Delete button.
+        -->
+        <ImageView
+            android:id="@+id/imageViewDefaultCheck"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_check_circle"
+            app:tint="?attr/colorPrimary"
+            android:visibility="gone"
+            tools:visibility="gone"
+            android:contentDescription="Built-in language" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

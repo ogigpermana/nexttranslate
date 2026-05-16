@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_language.xml
+    Layout for the Language Manager screen (LanguageFragment).
+
+    View ID contract (referenced by LanguageFragment.java):
+      - toolbar                : Back navigation + "Language Manager" title
+      - recyclerViewLanguages  : List of all supported languages with download status
+      - progressBarLanguage    : Full-screen loading indicator on initial list load
+
+    progressBarLanguage visibility is toggled programmatically in LanguageFragment:
+      - VISIBLE → while languageListLiveData emits Resource.loading()
+      - GONE    → after success or error response received
+
+    Each list item handles its own per-item progress indicator via
+    LanguageAdapter.setActiveLanguageCode() — see item_language.xml.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    tools:context=".presentation.language.LanguageFragment">
+
+    <!-- ======================================================================
+         Top App Bar
+         ====================================================================== -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorSurface"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationContentDescription="@string/cd_navigate_back"
+            app:title="@string/title_language_manager"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ======================================================================
+         Language list RecyclerView
+         Visible after initial load completes successfully.
+         ====================================================================== -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewLanguages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_language"
+        tools:itemCount="8" />
+
+    <!-- ======================================================================
+         Full-screen loading indicator.
+         Shown only during initial language list load (Resource.loading()).
+         Hidden once list data is available or an error occurs.
+         ====================================================================== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+       <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressBarLanguage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            android:indeterminate="true"
+            tools:visibility="visible" />
+
+        <!-- Optional loading label shown alongside spinner -->
+        <TextView
+            android:id="@+id/textViewLoadingLanguages"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/loading_languages"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
