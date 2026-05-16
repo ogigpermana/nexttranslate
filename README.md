@@ -237,16 +237,10 @@ SOFTWARE.
 
 ##Screenshot 
 
-![Translate Screen](screenshots/sc_01.png)
-![Language Source Screen](screenshots/sc_02.png)
-![Language Target Screen](screenshots/sc_03.png)
-![Language Manager Screen](screenshots/sc_04.png)
-![Bookmark Screen](screenshots/sc_05.png)
-
 <p>
-  <img src="screenshots/sc_01.png" width="200"/>
-  <img src="screenshots/sc_02.png" width="200"/>
-  <img src="screenshots/sc_03.png" width="200"/>
-  <img src="screenshots/sc_04.png" width="200"/>
-  <img src="screenshots/sc_05.png" width="200"/>
+  <img src="screenshots/sc_01.png" width="100"/>
+  <img src="screenshots/sc_02.png" width="100"/>
+  <img src="screenshots/sc_03.png" width="100"/>
+  <img src="screenshots/sc_04.png" width="100"/>
+  <img src="screenshots/sc_05.png" width="100"/>
 </p>
