@@ -6,10 +6,15 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.igoy86.nexttranslate.data.local.dao.CollectionDao;
+import com.igoy86.nexttranslate.data.local.dao.CollectionWordDao;
 import com.igoy86.nexttranslate.data.local.dao.FavoriteDao;
 import com.igoy86.nexttranslate.data.local.dao.HistoryDao;
+import com.igoy86.nexttranslate.data.local.entity.CollectionEntity;
+import com.igoy86.nexttranslate.data.local.entity.CollectionWordEntity;
 import com.igoy86.nexttranslate.data.local.entity.FavoriteEntity;
 import com.igoy86.nexttranslate.data.local.entity.HistoryEntity;
 import com.igoy86.nexttranslate.util.FileLogger;
@@ -18,7 +23,8 @@ import com.igoy86.nexttranslate.util.FileLogger;
  * The main Room database for the NextTranslate application.
  *
  * <p>Serves as the single source of truth for all locally persisted data,
- * including translation history and favorite translations.</p>
+ * including translation history, favorite translations, user collections,
+ * and words saved inside collections.</p>
  *
  * <p>This class is a singleton — only one instance is created for the
  * entire application lifecycle, shared across all repositories via
@@ -27,28 +33,33 @@ import com.igoy86.nexttranslate.util.FileLogger;
  * <p>Database configuration:</p>
  * <ul>
  *     <li>Name    : {@code nexttranslate.db}</li>
- *     <li>Version : {@code 1}</li>
- *     <li>Tables  : {@code history}, {@code favorites}</li>
+ *     <li>Version : {@code 3}</li>
+ *     <li>Tables  : {@code history}, {@code favorites}, {@code collections},
+ *                   {@code collection_words}</li>
+ * </ul>
+ *
+ * <p>Migration history:</p>
+ * <ul>
+ *     <li>Version 1 → 2: added {@code collections} table</li>
+ *     <li>Version 2 → 3: added {@code collection_words} table with a
+ *         CASCADE foreign key referencing {@code collections(id)}</li>
  * </ul>
  *
  * <p>Usage example:</p>
  * <pre>
  *     AppDatabase db = AppDatabase.getInstance(context);
  *     HistoryDao historyDao = db.historyDao();
- *     FavoriteDao favoriteDao = db.favoriteDao();
+ *     CollectionWordDao wordDao = db.collectionWordDao();
  * </pre>
- *
- * <p>To migrate the database in future versions, add a
- * {@link androidx.room.migration.Migration} object to
- * {@link Room.Builder#addMigrations(androidx.room.migration.Migration...)}
- * before releasing an update.</p>
  */
 @Database(
         entities = {
                 HistoryEntity.class,
-                FavoriteEntity.class
+                FavoriteEntity.class,
+                CollectionEntity.class,
+                CollectionWordEntity.class
         },
-        version = 1,
+        version = 3,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -61,6 +72,39 @@ public abstract class AppDatabase extends RoomDatabase {
 
     /** Singleton instance of the database. */
     private static volatile AppDatabase instance;
+
+    // -------------------------------------------------------------------------
+    // Migration: version 2 → 3
+    // -------------------------------------------------------------------------
+
+    /**
+     * Room migration from database version 2 to version 3.
+     *
+     * <p>Creates the {@code collection_words} table with a CASCADE foreign key
+     * on {@code collection_id} referencing the {@code collections} table.
+     * An index on {@code collection_id} is also created to speed up queries
+     * that filter words by collection.</p>
+     */
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `collection_words` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`collection_id` INTEGER NOT NULL, " +
+                    "`word` TEXT NOT NULL, " +
+                    "`definition` TEXT NOT NULL, " +
+                    "`added_at` INTEGER NOT NULL, " +
+                    "FOREIGN KEY(`collection_id`) REFERENCES `collections`(`id`) " +
+                    "ON DELETE CASCADE)"
+            );
+            database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_collection_words_collection_id` " +
+                    "ON `collection_words` (`collection_id`)"
+            );
+            FileLogger.i(TAG, "Migration 2→3 applied: collection_words table created.");
+        }
+    };
 
     // -------------------------------------------------------------------------
     // Abstract DAO accessors
@@ -79,6 +123,20 @@ public abstract class AppDatabase extends RoomDatabase {
      * @return the Room-generated {@link FavoriteDao} implementation
      */
     public abstract FavoriteDao favoriteDao();
+
+    /**
+     * Returns the {@link CollectionDao} for accessing the {@code collections} table.
+     *
+     * @return the Room-generated {@link CollectionDao} implementation
+     */
+    public abstract CollectionDao collectionDao();
+
+    /**
+     * Returns the {@link CollectionWordDao} for accessing the {@code collection_words} table.
+     *
+     * @return the Room-generated {@link CollectionWordDao} implementation
+     */
+    public abstract CollectionWordDao collectionWordDao();
 
     // -------------------------------------------------------------------------
     // Singleton accessor
@@ -114,9 +172,9 @@ public abstract class AppDatabase extends RoomDatabase {
     /**
      * Builds and configures the {@link AppDatabase} instance.
      *
-     * <p>Uses {@link Room#databaseBuilder} with a
-     * {@link RoomDatabase.Callback} to log when the database is first
-     * created or opened.</p>
+     * <p>Registers {@link #MIGRATION_2_3} to handle existing installs that
+     * are upgrading from version 2. Uses a {@link RoomDatabase.Callback}
+     * to log database lifecycle events.</p>
      *
      * @param context the application {@link Context}
      * @return the fully configured {@link AppDatabase} instance
@@ -128,6 +186,7 @@ public abstract class AppDatabase extends RoomDatabase {
                         AppDatabase.class,
                         DATABASE_NAME
                 )
+                .addMigrations(MIGRATION_2_3)
                 .addCallback(buildDatabaseCallback())
                 .build();
     }
@@ -137,7 +196,7 @@ public abstract class AppDatabase extends RoomDatabase {
      *
      * <p>Logs when the database is first created (initial install) and when
      * it is opened on subsequent app launches. Useful for debugging database
-     * initialization issues on mobile without a PC debugger.</p>
+     * initialization issues on a mobile-only development environment.</p>
      *
      * @return a {@link RoomDatabase.Callback} instance for lifecycle logging
      */

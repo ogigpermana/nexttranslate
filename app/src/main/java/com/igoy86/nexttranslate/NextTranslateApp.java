@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.igoy86.nexttranslate.di.AppContainer;
 import com.igoy86.nexttranslate.util.FileLogger;
+import com.igoy86.nexttranslate.util.UserSession;
 
 /**
  * Custom {@link Application} class for the NextTranslate application.
@@ -59,7 +60,11 @@ public class NextTranslateApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+		
+		// Apply saved theme on app start
+        final int savedMode = UserSession.getInstance(this).getThemeMode();
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(savedMode);
+		
         initFileLogger();
         initAppContainer();
 

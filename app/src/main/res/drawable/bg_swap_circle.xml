@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bg_swap_circle.xml
+    Circular background for the swap language button in TranslateFragment.
+    Uses colorPrimary fill so the swap icon stands out over the divider.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="?attr/colorSecondary" />
+</shape>

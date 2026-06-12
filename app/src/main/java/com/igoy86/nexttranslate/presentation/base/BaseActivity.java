@@ -90,6 +90,10 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Allow fragments to draw behind status bar and nav bar,
+        // so each fragment can handle its own window insets.
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
         binding = initBinding();
         setContentView(binding.getRoot());
 

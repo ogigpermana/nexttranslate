@@ -8,6 +8,12 @@
 
     <!-- Required for ML Kit offline model auto-download via Play Services -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+	
+	<!-- Required for ML Kit Translation Camera OCR -->
+	<uses-permission android:name="android.permission.CAMERA" />
+	
+	<!-- Required for record your voice to transcript into text -->
+	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:name=".NextTranslateApp"
@@ -21,6 +27,7 @@
 
         <activity
             android:name=".MainActivity"
+			android:screenOrientation="portrait"
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
             android:windowLightStatusBar="true">
@@ -37,7 +44,29 @@
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="translate" />
+			
+		<activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+		
+		<activity
+    android:name=".LanguageActivity"
+    android:screenOrientation="portrait"
+    android:exported="false"
+    android:windowSoftInputMode="adjustResize" />
 
     </application>
+	
+	<uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
 </manifest>

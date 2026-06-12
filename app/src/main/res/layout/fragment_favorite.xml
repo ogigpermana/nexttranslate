@@ -1,114 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     fragment_favorite.xml
-    Layout for the favorite translations screen (FavoriteFragment).
+    Favorites screen — accessible via the bottom nav Favorite tab.
 
-    View ID contract (referenced by FavoriteFragment.java):
-      - recyclerViewFavorites : List of bookmarked translation entries
-      - layoutEmptyState      : Shown when favorites list is empty
-
-    Empty state visibility is toggled programmatically in FavoriteFragment:
-      - layoutEmptyState      VISIBLE + recyclerViewFavorites GONE  → list empty
-      - layoutEmptyState      GONE    + recyclerViewFavorites VISIBLE → has items
-
-    Note: FavoriteFragment has no clear-all button (unlike HistoryFragment).
-    Individual items are deleted via swipe or delete icon in the adapter.
+    Layout structure:
+      - Root LinearLayout receives top inset (status bar) via
+        ViewCompat.setOnApplyWindowInsetsListener in FavoriteFragment.
+      - MaterialToolbar: back navigation (left) + clear-all menu icon (right).
+      - Empty state: centred icon + labels, shown when favorites list is empty.
+      - RecyclerView: paddingBottom="100dp" clears the bottom navigation bar.
 -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootFavorite"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="?attr/colorSurface"
     tools:context=".presentation.favorite.FavoriteFragment">
 
-    <!-- ======================================================================
-         Top App Bar
-         ====================================================================== -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="?attr/colorSurface"
-        app:elevation="0dp">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationContentDescription="@string/cd_navigate_back"
-            app:title="@string/title_favorite"
-            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- ======================================================================
-         Content area — RecyclerView OR Empty State (mutually exclusive)
-         ====================================================================== -->
-
     <!--
-        Favorites RecyclerView.
-        Visible when favoritesList is non-empty.
-        Hidden (GONE) when list is empty to avoid overlap with empty state.
+        Toolbar
+        navigationIcon : back arrow — wired in FavoriteFragment.initViews()
+        menu           : menu_favorite (clear-all action)
     -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewFavorites"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="16dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/item_favorite"
-        tools:itemCount="5" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationContentDescription="@string/cd_navigate_back"
+        app:title="@string/title_favorite"
+        app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
+        app:menu="@menu/menu_favorite" />
 
     <!--
-        Empty state container.
-        Centered vertically and horizontally.
-        Visible (VISIBLE) when favorites list is empty.
+        Empty state — shown when favorites list is empty.
+        Visibility toggled by FavoriteFragment.initObservers().
     -->
     <LinearLayout
         android:id="@+id/layoutEmptyState"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="32dp"
         android:visibility="gone"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:visibility="visible">
 
-        <!-- Empty state icon -->
         <ImageView
-            android:layout_width="96dp"
-            android:layout_height="96dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:src="@drawable/ic_bookmark_border"
-            android:alpha="0.4"
-            android:layout_marginBottom="16dp"
+            android:alpha="0.3"
             app:tint="?attr/colorOnSurfaceVariant"
             android:contentDescription="@null" />
 
-        <!-- Empty state title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="@string/empty_favorite_title"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            android:layout_marginBottom="8dp" />
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:alpha="0.5"
+            android:textColor="?attr/colorOnSurface" />
 
-        <!-- Empty state subtitle -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="@string/empty_favorite_subtitle"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
             android:gravity="center"
-            android:lineSpacingMultiplier="1.4" />
+            android:alpha="0.4"
+            android:textColor="?attr/colorOnSurface" />
 
     </LinearLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <!--
+        Favorites list.
+        paddingBottom="100dp" : clears the bottom navigation bar.
+        clipToPadding="false" : last item scrolls under the padding area.
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFavorites"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="100dp"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        tools:listitem="@layout/item_favorite"
+        tools:visibility="visible" />
+
+</LinearLayout>

@@ -112,4 +112,21 @@ public class FavoriteRepositoryImpl implements FavoriteRepository {
             }
         });
     }
+	
+	/**
+     * {@inheritDoc}
+     *
+     * <p>Dispatches the clear-all operation to a background disk I/O thread.</p>
+     */
+    @Override
+    public void clearAllFavorites() {
+        appExecutors.diskIO().execute(() -> {
+            try {
+                favoriteDao.clearAll();
+                FileLogger.d(TAG, "All favorites cleared.");
+            } catch (Exception ex) {
+                FileLogger.e(TAG, "Failed to clear all favorites.", ex);
+            }
+        });
+    }
 }

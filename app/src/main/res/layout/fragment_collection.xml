@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_collection.xml
+    Collections screen — entry point for user collections and dictionary lookup.
+
+    Layout structure:
+      - Root LinearLayout receives top inset via ViewCompat in CollectionFragment.
+      - MaterialToolbar: title only (no back arrow — this is a top-level tab).
+      - NestedScrollView wraps everything so the whole screen scrolls together.
+        Inside it:
+          Section 1 — "Koleksi Saya":
+            - Section header + "+" icon button to create a new collection.
+            - RecyclerView (non-scrollable, 2-column grid) showing user collections.
+            - Empty state text shown when no collections exist.
+          Section 2 — "Kamus":
+            - Search input field (TextInputLayout).
+            - Lookup result card (hidden until a search is performed).
+      - FAB: shortcut to create a new collection (same as "+" in header).
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootCollection"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
+
+    <!--
+        Toolbar
+        No navigation icon — CollectionFragment is a root tab.
+    -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        app:title="@string/title_collections"
+        app:titleTextColor="?attr/colorOnSurface" />
+
+    <!--
+        Main scrollable content
+        fillViewport="true" ensures the content fills the screen
+        even when the list is empty.
+    -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:paddingBottom="140dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp">
+
+            <!-- ============================================================
+                 Section 1: Koleksi Saya
+                 ============================================================ -->
+
+            <!--
+                Section header row
+                Left: "Koleksi Saya" title
+                Right: "+" icon button to create a new collection
+            -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/label_my_collections"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddCollection"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_add"
+                    android:contentDescription="@string/cd_add_collection" />
+
+            </LinearLayout>
+
+            <!--
+                Empty state for "Koleksi Saya"
+                Shown when the user has no collections yet.
+                Hidden once at least one collection exists.
+            -->
+            <LinearLayout
+                android:id="@+id/layoutEmptyCollections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingVertical="32dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_collections"
+                    android:alpha="0.3"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/empty_collections"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:alpha="0.5"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!--
+                User collections grid (2 columns)
+                nestedScrollingEnabled="false" — parent NestedScrollView handles scrolling.
+                Height is wrap_content because RecyclerView is inside a ScrollView.
+                The GridLayoutManager is set programmatically in CollectionFragment.
+            -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewCollections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone"
+                tools:listitem="@layout/item_collection_card"
+                tools:visibility="visible" />
+
+            <!-- Spacer between sections -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
+
+            <!-- ============================================================
+                 Section 2: Kamus (Dictionary Lookup)
+                 ============================================================ -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_dictionary"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <!--
+                Dictionary search field
+                Outlined style matching the translate input on TextFragment.
+                End icon clears the input.
+            -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilDictionarySearch"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_dictionary_search"
+                    app:startIconDrawable="@drawable/ic_search"
+                    app:startIconContentDescription="@string/cd_search_word"
+                    app:endIconMode="clear_text"
+                    app:endIconContentDescription="@string/cd_clear_search">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDictionarySearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:singleLine="true"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!--
+                Loading indicator — shown while dictionary API call is in progress.
+            -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressDictionary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:trackCornerRadius="4dp" />
+
+            <!--
+                Dictionary error message
+                Shown when the API returns a 404 or network error.
+            -->
+            <TextView
+                android:id="@+id/textViewDictionaryError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorError"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:text="Word not found in dictionary."
+                tools:visibility="visible" />
+
+            <!--
+                Dictionary result card
+                Hidden until a successful lookup is performed.
+                Contains: word + pronunciation, part-of-speech chips,
+                definitions list, synonyms, antonyms.
+            -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDictionaryResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Word + pronunciation row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <TextView
+                            android:id="@+id/textViewDictionaryWord"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold"
+                            tools:text="serendipity" />
+
+                        <!-- TTS button to hear the word pronounced -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDictionarySpeak"
+                            style="@style/Widget.Material3.Button.IconButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_volume_up"
+                            android:contentDescription="@string/cd_speak_word" />
+
+                    </LinearLayout>
+
+                    <!-- IPA pronunciation -->
+                    <TextView
+                        android:id="@+id/textViewDictionaryPronunciation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorPrimary"
+                        android:layout_marginBottom="12dp"
+                        android:visibility="gone"
+                        tools:text="/ˌserənˈdɪpɪti/"
+                        tools:visibility="visible" />
+						
+					<!-- Language label e.g. "English · noun" -->
+                    <TextView
+                        android:id="@+id/textViewDictionaryLanguage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone"
+                        tools:text="English"
+                        tools:visibility="visible" />
+
+                    <!-- Part of speech chip -->
+                    <TextView
+                        android:id="@+id/textViewDictionaryPartOfSpeech"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        android:background="@drawable/bg_chip_pos"
+                        android:layout_marginBottom="12dp"
+                        android:visibility="gone"
+                        tools:text="noun"
+                        tools:visibility="visible" />
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/colorOutlineVariant"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Definitions RecyclerView (non-scrollable) -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewDefinitions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+
+                    <!-- Synonyms section -->
+                    <TextView
+                        android:id="@+id/labelSynonyms"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_synonyms"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="6dp"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupSynonyms"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone" />
+
+                    <!-- Antonyms section -->
+                    <TextView
+                        android:id="@+id/labelAntonyms"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_antonyms"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="6dp"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupAntonyms"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone" />
+						
+					<!-- Also found in other languages -->
+                    <TextView
+                        android:id="@+id/textViewAlsoFoundIn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:fontStyle="italic"
+                        android:visibility="gone"
+                        tools:text="Also found in: German, Slovak"
+                        tools:visibility="visible" />
+					
+					 <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveToCollection"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Save to Collection"
+                        android:contentDescription="Save this word to one of your collections"
+                        app:icon="@drawable/ic_add" />
+						
+					<!-- Explain with AI button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExplainAi"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/btn_explain_with_ai"
+                        app:icon="@drawable/ic_tooltip" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+			
+			<!-- ============================================================
+                 AI Word Explanation Card
+                 Visible only after user taps "Explain with AI" button
+                 inside the dictionary result card above.
+                 ============================================================ -->
+
+            <!-- Explain loading indicator -->
+            <ProgressBar
+                android:id="@+id/progressExplainAi"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+            <!-- AI Explain result card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardExplainAi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Header row: icon + label -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_tooltip"
+                            android:layout_marginEnd="6dp"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/label_ai_explanation"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textColor="?attr/colorPrimary"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- Explanation text -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🇬🇧 English"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/textViewExplainEn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnSurface"
+                        android:lineSpacingMultiplier="1.4"
+                        android:selectable="true"
+                        android:layout_marginBottom="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🇮🇩 Indonesia"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/textViewExplainId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnSurface"
+                        android:lineSpacingMultiplier="1.4"
+                        android:selectable="true" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

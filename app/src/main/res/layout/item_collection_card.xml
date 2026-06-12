@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_collection_card.xml
+    A single colourful card in the "Koleksi Saya" 2-column grid.
+
+    Design (Yandex-style):
+      - Full-colour background set programmatically via CollectionAdapter
+        using CollectionItem.colorHex.
+      - Collection name in white bold text (top-left).
+      - Item count + list icon at the bottom-left.
+      - Long-press triggers rename/delete context menu in CollectionFragment.
+
+    View ID contract (referenced by CollectionAdapter.java):
+      - textViewCollectionName  : display name of the collection
+      - textViewItemCount       : number of saved words (e.g. "12 kata")
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardCollection"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!--
+        Root FrameLayout fills the card with a ripple overlay on top of
+        the solid colour background set programmatically.
+    -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foreground="?attr/selectableItemBackground">
+
+        <!--
+            Content layout — name at top, count at bottom
+        -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <!-- Collection name -->
+            <TextView
+                android:id="@+id/textViewCollectionName"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:maxLines="3"
+                android:ellipsize="end"
+                tools:text="Travel Phrases" />
+
+            <!-- Bottom row: item count + list icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/textViewItemCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="#CCFFFFFF"
+                    tools:text="0" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_list"
+                    android:alpha="0.7"
+                    app:tint="@color/md_theme_light_onPrimary"
+                    android:contentDescription="@null" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,128 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     fragment_history.xml
-    Layout for the translation history screen (HistoryFragment).
+    Translation history screen.
 
-    View ID contract (referenced by HistoryFragment.java):
-      - toolbar              : Back navigation + "History" title + clear button
-      - recyclerViewHistory  : List of past translation entries
-      - layoutEmptyState     : Shown when history list is empty
-      - buttonClearHistory   : Triggers clear-all confirmation dialog
-
-    Empty state visibility is toggled programmatically in HistoryFragment:
-      - layoutEmptyState  VISIBLE  + recyclerViewHistory GONE  → list is empty
-      - layoutEmptyState  GONE     + recyclerViewHistory VISIBLE → list has items
+    Layout structure:
+      - Root LinearLayout receives top inset (status bar) via
+        ViewCompat.setOnApplyWindowInsetsListener in HistoryFragment,
+        so the toolbar sits correctly below the status bar on all API levels.
+      - MaterialToolbar: back navigation (left) + clear-all menu (right).
+      - Empty state: centred icon + label, shown when history list is empty.
+      - RecyclerView: paddingBottom="80dp" keeps the last item above the
+        bottom navigation bar; clipToPadding="false" allows overscroll.
 -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootHistory"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    tools:context=".presentation.history.HistoryFragment">
-
-    <!-- ======================================================================
-         Top App Bar
-         ====================================================================== -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="?attr/colorSurface"
-        app:elevation="0dp">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationContentDescription="@string/cd_navigate_back"
-            app:title="@string/title_history"
-            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- ======================================================================
-         Content area — RecyclerView OR Empty State (mutually exclusive)
-         ====================================================================== -->
+    android:orientation="vertical"
+    android:background="?attr/colorSurface">
 
     <!--
-        History RecyclerView.
-        Visible when historyList is non-empty.
-        Hidden (GONE) when list is empty to avoid overlap with empty state.
+        Toolbar
+        navigationIcon  : back arrow — wired in HistoryFragment.initListeners()
+        menu            : menu_history (clear-all action)
     -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewHistory"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="80dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/item_history"
-        tools:itemCount="6" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationContentDescription="@string/cd_back"
+        app:title="@string/title_history"
+        app:titleTextColor="?attr/colorOnSurface"
+        app:menu="@menu/menu_history" />
 
     <!--
-        Empty state container.
-        Centered vertically and horizontally.
-        Visible (VISIBLE) when history list is empty.
+        Empty state
+        Visibility toggled by HistoryFragment: VISIBLE when list is empty,
+        GONE when the RecyclerView has items.
     -->
     <LinearLayout
         android:id="@+id/layoutEmptyState"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="32dp"
         android:visibility="gone"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:visibility="visible">
 
-        <!-- Empty state icon -->
         <ImageView
-            android:layout_width="96dp"
-            android:layout_height="96dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:src="@drawable/ic_history"
-            android:alpha="0.4"
-            android:layout_marginBottom="16dp"
-            app:tint="?attr/colorOnSurfaceVariant"
+            android:alpha="0.3"
             android:contentDescription="@null" />
 
-        <!-- Empty state title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/empty_history_title"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Empty state subtitle -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/empty_history_subtitle"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:gravity="center"
-            android:lineSpacingMultiplier="1.4" />
+            android:layout_marginTop="16dp"
+            android:text="@string/empty_history"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:alpha="0.5"
+            android:textColor="?attr/colorOnSurface" />
 
     </LinearLayout>
 
-    <!-- ======================================================================
-         Clear All FAB — anchored to bottom
-         Triggers showClearHistoryConfirmDialog() in HistoryFragment
-         Only meaningful when list is non-empty; Fragment handles enabled state
-         ====================================================================== -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/buttonClearHistory"
-        style="@style/Widget.Material3.Button.TonalButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_margin="16dp"
-        android:text="@string/action_clear_history"
-        app:icon="@drawable/ic_delete_sweep" />
+    <!--
+        History list
+        paddingBottom="80dp"   : clears the bottom navigation bar so the
+                                 last card is fully visible.
+        clipToPadding="false"  : list items scroll under the padding area
+                                 (overscroll effect).
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewHistory"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="140dp"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        tools:listitem="@layout/item_history"
+        tools:visibility="visible" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

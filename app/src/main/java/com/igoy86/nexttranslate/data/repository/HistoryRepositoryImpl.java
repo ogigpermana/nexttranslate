@@ -64,7 +64,8 @@ public class HistoryRepositoryImpl implements HistoryRepository {
     /**
      * {@inheritDoc}
      *
-     * <p>Converts the given {@link HistoryItem} to a {@link com.igoy86.nexttranslate.data.local.entity.HistoryEntity}
+     * <p>Converts the given {@link HistoryItem} to a
+     * {@link com.igoy86.nexttranslate.data.local.entity.HistoryEntity}
      * via {@link HistoryMapper} and inserts it on a background disk I/O thread.</p>
      */
     @Override
@@ -82,10 +83,67 @@ public class HistoryRepositoryImpl implements HistoryRepository {
     /**
      * {@inheritDoc}
      *
-     * <p>Uses {@link androidx.lifecycle.Transformations#map} to convert the
-     * {@link LiveData} list of {@link com.igoy86.nexttranslate.data.local.entity.HistoryEntity}
-     * objects emitted by Room into a {@link LiveData} list of {@link HistoryItem}
-     * domain models before returning it to the caller.</p>
+     * <p>Inserts the entity on a background disk I/O thread and delivers
+     * the generated row ID via {@link HistoryRepository.InsertCallback}.
+     * The callback is invoked on the same background thread — callers
+     * responsible for updating ViewModel state must post back to the
+     * main thread via
+     * {@link AppExecutors#mainThread()}.</p>
+     */
+    @Override
+    public void insertAndGetId(
+            @NonNull HistoryItem item,
+            @NonNull HistoryRepository.InsertCallback callback
+    ) {
+        appExecutors.diskIO().execute(() -> {
+            try {
+                final long generatedId = historyDao.insertAndGetId(
+                        HistoryMapper.toEntity(item)
+                );
+                FileLogger.d(TAG, "History inserted with id=" + generatedId
+                        + " text=" + item.getSourceText());
+                callback.onInserted(generatedId);
+            } catch (Exception ex) {
+                FileLogger.e(TAG, "Failed to insert history entry.", ex);
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Dispatches the update to a background disk I/O thread.
+     * Only text content and timestamp are overwritten; target language
+     * code is left unchanged.</p>
+     */
+    @Override
+    public void updateHistory(
+            long id,
+            @NonNull String sourceText,
+            @NonNull String translatedText,
+            @NonNull String sourceLanguageCode,
+            long timestamp
+    ) {
+        appExecutors.diskIO().execute(() -> {
+            try {
+                historyDao.updateHistory(id, sourceText, translatedText,
+                        sourceLanguageCode, timestamp);
+                FileLogger.d(TAG, "History updated: id=" + id
+                        + " text=" + sourceText);
+            } catch (Exception ex) {
+                FileLogger.e(TAG, "Failed to update history entry: id=" + id, ex);
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Uses {@link Transformations#map} to convert the
+     * {@link LiveData} list of
+     * {@link com.igoy86.nexttranslate.data.local.entity.HistoryEntity}
+     * objects emitted by Room into a {@link LiveData} list of
+     * {@link HistoryItem} domain models before returning it to the caller.</p>
      */
     @Override
     public LiveData<List<HistoryItem>> getAllHistory() {

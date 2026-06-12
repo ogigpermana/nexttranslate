@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    menu_history.xml
+    Location: res/menu/menu_history.xml
+
+    Menu for toolbar in HistoryFragment.
+    Item "Delete all" — tap to trigger showClearHistoryConfirmDialog().
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_clear_all_history"
+        android:title="@string/menu_clear_all_history"
+        android:icon="@drawable/ic_delete"
+        app:showAsAction="ifRoom" />
+
+</menu>

@@ -1,5 +1,6 @@
 package com.igoy86.nexttranslate.presentation.favorite;
 
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -11,35 +12,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.igoy86.nexttranslate.databinding.ItemFavoriteBinding;
 import com.igoy86.nexttranslate.domain.model.FavoriteItem;
 
+import com.igoy86.nexttranslate.util.TimeFormatter;
+
 /**
  * RecyclerView adapter for displaying favorite translation entries.
  *
- * <p>Extends {@link ListAdapter} with {@link DiffUtil} for efficient,
- * automatic list diffing and minimal UI updates when the favorites list changes.</p>
+ * <p>Gmail inbox style — items share one rounded surface container;
+ * individual items have no card elevation. Top and bottom corners are
+ * rounded only on the first and last items via {@code updateItemShape()}.</p>
  *
- * <p>Each item displays the source text, translated text, and language pair.
- * Supports two user interactions via {@link OnFavoriteItemClickListener}:</p>
- * <ul>
- *     <li>Tap item — re-uses the translation on the translate screen</li>
- *     <li>Tap delete icon — removes the entry from favorites</li>
- * </ul>
+ * <p>Delete is triggered by swiping left or right (handled in FavoriteFragment
+ * via {@code ItemTouchHelper}). No delete icon in the item layout.</p>
  *
- * <p>Usage example:</p>
- * <pre>
- *     FavoriteAdapter adapter = new FavoriteAdapter(new FavoriteAdapter.OnFavoriteItemClickListener() {
- *         {@literal @}Override
- *         public void onItemClick(FavoriteItem item) {
- *             // handle item tap
- *         }
- *
- *         {@literal @}Override
- *         public void onDeleteClick(FavoriteItem item) {
- *             viewModel.deleteFavorite(item.getId());
- *         }
- *     });
- *     recyclerView.setAdapter(adapter);
- *     adapter.submitList(favoriteList);
- * </pre>
+ * <p>Tap item → {@link OnFavoriteItemClickListener#onItemClick} to restore
+ * the translation on the translate screen.</p>
  */
 public class FavoriteAdapter extends ListAdapter<FavoriteItem, FavoriteAdapter.FavoriteViewHolder> {
 
@@ -48,72 +34,38 @@ public class FavoriteAdapter extends ListAdapter<FavoriteItem, FavoriteAdapter.F
     // -------------------------------------------------------------------------
 
     /**
-     * Callback interface for handling user interactions with favorite list items.
+     * Callback for tap interactions on favorite list items.
+     * Delete is handled separately via ItemTouchHelper swipe.
      */
     public interface OnFavoriteItemClickListener {
 
         /**
-         * Called when the user taps on a favorite item to reuse it.
+         * Called when the user taps a favorite item to reuse it.
          *
          * @param item the tapped {@link FavoriteItem}
          */
         void onItemClick(@NonNull FavoriteItem item);
-
-        /**
-         * Called when the user taps the delete icon on a favorite item.
-         *
-         * @param item the {@link FavoriteItem} to delete
-         */
-        void onDeleteClick(@NonNull FavoriteItem item);
     }
 
     // -------------------------------------------------------------------------
-    // DiffUtil callback
+    // DiffUtil
     // -------------------------------------------------------------------------
 
-    /**
-     * {@link DiffUtil.ItemCallback} implementation for {@link FavoriteItem}.
-     *
-     * <p>Used by {@link ListAdapter} to compute the minimal set of changes
-     * between two lists, enabling efficient RecyclerView animations.</p>
-     */
     private static final DiffUtil.ItemCallback<FavoriteItem> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<FavoriteItem>() {
-
-                /**
-                 * Checks whether two items represent the same database record
-                 * by comparing their unique IDs.
-                 *
-                 * @param oldItem the item from the previous list
-                 * @param newItem the item from the new list
-                 * @return {@code true} if both items have the same database ID
-                 */
                 @Override
                 public boolean areItemsTheSame(
-                        @NonNull FavoriteItem oldItem,
-                        @NonNull FavoriteItem newItem
-                ) {
+                        @NonNull FavoriteItem oldItem, @NonNull FavoriteItem newItem) {
                     return oldItem.getId() == newItem.getId();
                 }
 
-                /**
-                 * Checks whether two items have identical content.
-                 * Called only when {@link #areItemsTheSame} returns {@code true}.
-                 *
-                 * @param oldItem the item from the previous list
-                 * @param newItem the item from the new list
-                 * @return {@code true} if all fields are equal
-                 */
                 @Override
                 public boolean areContentsTheSame(
-                        @NonNull FavoriteItem oldItem,
-                        @NonNull FavoriteItem newItem
-                ) {
+                        @NonNull FavoriteItem oldItem, @NonNull FavoriteItem newItem) {
                     return oldItem.equals(newItem);
                 }
             };
 
-    /** Listener for item tap and delete tap events. */
     @NonNull
     private final OnFavoriteItemClickListener listener;
 
@@ -122,47 +74,106 @@ public class FavoriteAdapter extends ListAdapter<FavoriteItem, FavoriteAdapter.F
     // -------------------------------------------------------------------------
 
     /**
-     * Constructs a new {@link FavoriteAdapter} with the given click listener.
+     * Constructs a new {@link FavoriteAdapter}.
      *
-     * @param listener the callback for item interactions; must not be null
+     * @param listener the callback for item tap; must not be null
      */
     public FavoriteAdapter(@NonNull OnFavoriteItemClickListener listener) {
         super(DIFF_CALLBACK);
         this.listener = listener;
+        setHasStableIds(true);
     }
 
     // -------------------------------------------------------------------------
     // ListAdapter overrides
     // -------------------------------------------------------------------------
 
-    /**
-     * Inflates the item layout and creates a new {@link FavoriteViewHolder}.
-     *
-     * @param parent   the RecyclerView into which the new view will be added
-     * @param viewType the view type of the new view (unused; single view type)
-     * @return a new {@link FavoriteViewHolder} holding the inflated item view
-     */
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
+    }
+
     @NonNull
     @Override
     public FavoriteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        final ItemFavoriteBinding binding = ItemFavoriteBinding.inflate(
-                LayoutInflater.from(parent.getContext()),
-                parent,
-                false
-        );
-        return new FavoriteViewHolder(binding);
+        return new FavoriteViewHolder(ItemFavoriteBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false));
     }
 
-    /**
-     * Binds the {@link FavoriteItem} at the given position to the
-     * {@link FavoriteViewHolder}.
-     *
-     * @param holder   the ViewHolder to update
-     * @param position the position of the item in the adapter's data set
-     */
     @Override
     public void onBindViewHolder(@NonNull FavoriteViewHolder holder, int position) {
         holder.bind(getItem(position), listener);
+        updateItemShape(holder, position);
+    }
+
+    /**
+     * After a delete, the new last/first items need their shapes refreshed
+     * so rounded corners are applied correctly.
+     */
+    @Override
+    public void onCurrentListChanged(
+            @NonNull java.util.List<FavoriteItem> previousList,
+            @NonNull java.util.List<FavoriteItem> currentList
+    ) {
+        super.onCurrentListChanged(previousList, currentList);
+        if (!currentList.isEmpty()) {
+            notifyItemChanged(0);
+            notifyItemChanged(currentList.size() - 1);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Public helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns the item at the given position.
+     * Used by FavoriteFragment after a swipe gesture.
+     */
+    @NonNull
+    public FavoriteItem getItemAt(int position) {
+        return getItem(position);
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Applies rounded corners based on position — Gmail inbox style.
+     * Also hides the divider on the last item.
+     *
+     * @param holder   the ViewHolder to update
+     * @param position the adapter position
+     */
+    private void updateItemShape(@NonNull FavoriteViewHolder holder, int position) {
+        final boolean isFirst = position == 0;
+        final boolean isLast  = position == getItemCount() - 1;
+        final float corner    = holder.itemView.getContext()
+                .getResources().getDisplayMetrics().density * 14;
+
+        com.google.android.material.shape.ShapeAppearanceModel shapeModel =
+                com.google.android.material.shape.ShapeAppearanceModel.builder()
+                        .setTopLeftCornerSize(isFirst ? corner : 0f)
+                        .setTopRightCornerSize(isFirst ? corner : 0f)
+                        .setBottomLeftCornerSize(isLast ? corner : 0f)
+                        .setBottomRightCornerSize(isLast ? corner : 0f)
+                        .build();
+
+        com.google.android.material.shape.MaterialShapeDrawable shapeDrawable =
+                new com.google.android.material.shape.MaterialShapeDrawable(shapeModel);
+
+        shapeDrawable.setFillColor(
+                android.content.res.ColorStateList.valueOf(
+                        com.google.android.material.color.MaterialColors.getColor(
+                                holder.itemView,
+                                com.google.android.material.R.attr.colorSurfaceContainer, 0)));
+
+        holder.binding.rootItemFavorite.setBackground(shapeDrawable);
+
+        // Hide divider on last item
+        holder.binding.viewDivider.setVisibility(
+                isLast ? android.view.View.GONE : android.view.View.VISIBLE);
     }
 
     // -------------------------------------------------------------------------
@@ -171,51 +182,38 @@ public class FavoriteAdapter extends ListAdapter<FavoriteItem, FavoriteAdapter.F
 
     /**
      * ViewHolder for a single favorite translation list item.
-     *
-     * <p>Holds a reference to the inflated {@link ItemFavoriteBinding} and
-     * binds {@link FavoriteItem} data to the corresponding views.</p>
      */
     public static class FavoriteViewHolder extends RecyclerView.ViewHolder {
 
-        /** ViewBinding for the favorite item layout. */
         @NonNull
-        private final ItemFavoriteBinding binding;
+        final ItemFavoriteBinding binding;
 
-        /**
-         * Constructs a new {@link FavoriteViewHolder} with the given binding.
-         *
-         * @param binding the inflated item layout binding; must not be null
-         */
         public FavoriteViewHolder(@NonNull ItemFavoriteBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
 
         /**
-         * Binds the given {@link FavoriteItem} data to this ViewHolder's views
-         * and attaches click listeners for item tap and delete tap events.
+         * Binds {@link FavoriteItem} data to the views.
          *
-         * @param item     the favorite entry to display; must not be null
-         * @param listener the callback for user interactions; must not be null
+         * @param item     the favorite entry to display
+         * @param listener the callback for item tap
          */
         public void bind(
                 @NonNull FavoriteItem item,
                 @NonNull OnFavoriteItemClickListener listener
         ) {
-            // Bind text data
             binding.textViewSourceText.setText(item.getSourceText());
             binding.textViewTranslatedText.setText(item.getTranslatedText());
             binding.textViewLanguagePair.setText(
                     item.getSourceLanguageCode().toUpperCase()
                             + " → "
-                            + item.getTargetLanguageCode().toUpperCase()
-            );
+                            + item.getTargetLanguageCode().toUpperCase());
 
-            // Item tap — reuse translation
+            // Relative timestamp using savedAt field
+            binding.textViewTimestamp.setText(TimeFormatter.format(item.getSavedAt()));
+
             binding.getRoot().setOnClickListener(v -> listener.onItemClick(item));
-
-            // Delete icon tap — remove from favorites
-            binding.imageViewDelete.setOnClickListener(v -> listener.onDeleteClick(item));
         }
     }
 }

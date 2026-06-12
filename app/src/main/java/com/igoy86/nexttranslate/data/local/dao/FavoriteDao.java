@@ -104,4 +104,11 @@ public interface FavoriteDao {
      */
     @Query("SELECT COUNT(*) FROM favorites")
     int getFavoritesCount();
+	
+	/**
+     * Deletes all entries from the favorites table.
+     * Called by {@link com.igoy86.nexttranslate.data.repository.FavoriteRepositoryImpl#clearAllFavorites()}.
+     */
+    @Query("DELETE FROM favorites")
+    void clearAll();
 }

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bottom_sheet_translate_mode.xml
+    Translation mode selector — shown when the user taps chipTranslateMode.
+
+    Layout:
+      Handle bar
+      Title "Choose translate mode"
+      Row 1 : Fast  (ML Kit offline)  — highlighted when switch OFF
+      Row 2 : AI Online (Groq)        — highlighted when switch ON
+      Switch in Row 2 controls mode
+
+    View ID contract:
+      rowModeFast        : tappable row — selects Fast mode
+      textModeFast       : "Fast translation" label (dimmed when inactive)
+      textModeFastSub    : "Offline · ML Kit" subtitle
+      rowModeAi          : tappable row — selects AI Online mode
+      textModeAi         : "Translate AI" label (dimmed when inactive)
+      textModeAiSub      : "Online · Groq" subtitle
+      switchTranslateMode: MaterialSwitch, OFF = Fast, ON = AI Online
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="24dp">
+
+    <!-- Handle bar -->
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_bottom_sheet_handle"
+        android:backgroundTint="?attr/colorOutlineVariant" />
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="8dp"
+        android:text="@string/label_select_mode"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textColor="?attr/colorOnSurface" />
+
+    <!-- ── Row 1: Fast (ML Kit offline) ───────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/rowModeFast"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:background="?attr/selectableItemBackground">
+
+        <!-- Mode icon -->
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_bolt"
+            android:background="@drawable/bg_avatar_circle"
+            android:backgroundTint="?attr/colorSecondaryContainer"
+            android:contentDescription="@null" />
+
+        <!-- Labels -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/textModeFast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_fast"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/textModeFastSub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_fast_sub"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ── Row 2: AI Online (Groq) ────────────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/rowModeAi"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:background="?attr/selectableItemBackground">
+
+        <!-- Mode icon -->
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_auto_awesome"
+            android:background="@drawable/bg_avatar_circle"
+            android:backgroundTint="?attr/colorTertiaryContainer"
+            android:contentDescription="@null" />
+
+        <!-- Labels -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/textModeAi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_ai"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/textModeAiSub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_ai_sub"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+        </LinearLayout>
+
+        <!--
+            MaterialSwitch — OFF = Fast, ON = AI Online.
+            Positioned at the right end of the AI row.
+        -->
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchTranslateMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/cd_switch_mode" />
+
+    </LinearLayout>
+
+</LinearLayout>

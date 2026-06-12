@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_save_collection_option.xml
+    A single selectable row in the "Save to Collection" bottom sheet RecyclerView.
+
+    Layout structure:
+      - Root LinearLayout (horizontal) — the entire row is tappable.
+        - Color indicator View: a small colored circle matching the collection color.
+        - Collection name TextView: fills remaining space.
+        - RadioButton: indicates the currently selected collection.
+          Pointer events are disabled on the RadioButton itself;
+          selection is managed by tapping the entire row.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="14dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Collection color indicator circle -->
+    <View
+        android:id="@+id/viewColorIndicator"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="14dp"
+        android:background="@drawable/bg_color_circle" />
+
+    <!-- Collection name -->
+    <TextView
+        android:id="@+id/textCollectionName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?attr/colorOnSurface"
+        android:singleLine="true"
+        android:ellipsize="end" />
+
+    <!-- Selection indicator -->
+    <RadioButton
+        android:id="@+id/radioSelected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false" />
+
+</LinearLayout>

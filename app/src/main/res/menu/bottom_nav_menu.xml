@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bottom_nav_menu.xml
+    Menu resource for the BottomNavigationView in MainActivity.
+
+    Tabs (4 items, mirrors Yandex Translate layout minus "Sites"):
+      1. nav_text    — Text translation screen (TranslateFragment)
+      2. nav_photo   — Photo / OCR screen (PhotoFragment) [placeholder]
+      3. nav_favorite — Saved / Favorite translations (FavoriteFragment)
+      4. nav_dialog  — Two-way interpreter mode (DialogModeFragment) [placeholder]
+
+    Icons used here must exist in res/drawable/.
+    Replace ic_photo, ic_dialog with your final assets when ready.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Text translation — main entry point -->
+    <item
+        android:id="@+id/nav_text"
+        android:icon="@drawable/ic_translate"
+        android:title="@string/nav_text" />
+
+    <!-- Photo / OCR — placeholder, logic TBD -->
+    <item
+        android:id="@+id/nav_photo"
+        android:icon="@drawable/ic_camera"
+        android:title="@string/nav_photo" />
+
+    <!-- Saved favorites -->
+    <item
+        android:id="@+id/nav_favorite"
+        android:icon="@drawable/ic_bookmark"
+        android:title="@string/nav_favorite" />
+
+    <!-- Two-way interpreter / dialog mode — placeholder, logic TBD -->
+    <item
+        android:id="@+id/nav_dialog"
+        android:icon="@drawable/ic_dialog"
+        android:title="@string/nav_dialog" />
+
+</menu>

@@ -1,6 +1,7 @@
 package com.igoy86.nexttranslate.presentation.translate;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -11,8 +12,11 @@ import com.igoy86.nexttranslate.domain.model.HistoryItem;
 import com.igoy86.nexttranslate.domain.model.TranslationResult;
 import com.igoy86.nexttranslate.domain.usecase.favorite.AddFavoriteUseCase;
 import com.igoy86.nexttranslate.domain.usecase.history.AddHistoryUseCase;
+import com.igoy86.nexttranslate.domain.usecase.history.UpdateHistoryUseCase;
+import com.igoy86.nexttranslate.domain.repository.HistoryRepository;
 import com.igoy86.nexttranslate.domain.usecase.translate.DetectLanguageUseCase;
 import com.igoy86.nexttranslate.domain.usecase.translate.TranslateTextUseCase;
+import com.igoy86.nexttranslate.domain.usecase.translate.RemoteTranslateTextUseCase;
 import com.igoy86.nexttranslate.presentation.base.BaseViewModel;
 import com.igoy86.nexttranslate.util.FileLogger;
 import com.igoy86.nexttranslate.util.Resource;
@@ -46,6 +50,10 @@ public class TranslateViewModel extends BaseViewModel {
     /** Use case for performing ML Kit text translation. */
     @NonNull
     private final TranslateTextUseCase translateTextUseCase;
+	
+	/** Use case for performing remote Groq text translation (online). */
+    @NonNull
+    private final RemoteTranslateTextUseCase remoteTranslateTextUseCase;
 
     /** Use case for detecting the language of the input text. */
     @NonNull
@@ -58,6 +66,13 @@ public class TranslateViewModel extends BaseViewModel {
     /** Use case for bookmarking a translation as a favorite. */
     @NonNull
     private final AddFavoriteUseCase addFavoriteUseCase;
+	
+	/**
+     * Use case for updating an existing history entry in-place.
+     * Used on the second and subsequent translates within the same session.
+     */
+    @NonNull
+    private final UpdateHistoryUseCase updateHistoryUseCase;
 
     // -------------------------------------------------------------------------
     // UI State LiveData
@@ -116,6 +131,59 @@ public class TranslateViewModel extends BaseViewModel {
      */
     private boolean isAutoDetectUpdate = false;
 
+    /**
+     * The source text of the most recently saved history entry.
+     *
+     * <p>Used together with {@link #lastSavedTargetLang} to prevent
+     * duplicate history entries when the same text is re-translated
+     * (e.g. after switching online/offline mode or fragment recreation).</p>
+     *
+     * <p>{@code null} means nothing has been saved in this ViewModel session.</p>
+     */
+    @Nullable
+    private String lastSavedSourceText = null;
+
+    /**
+     * The target language code of the most recently saved history entry.
+     *
+     * <p>Used together with {@link #lastSavedSourceText} to form a
+     * composite key for deduplication. A language change with the same
+     * source text is treated as a new unique entry and will be saved.</p>
+     */
+    @Nullable
+    private String lastSavedTargetLang = null;
+	
+	/**
+     * The database ID of the history entry created in the current translate session.
+     *
+     * <p>On the first successful translation in a session, a new row is INSERTed
+     * and its auto-generated ID is stored here. Subsequent translations in the
+     * same session call UPDATE on this ID instead of creating a new row —
+     * replicating Google Translate's "one entry per session" behaviour.</p>
+     *
+     * <p>{@code -1L} means no entry has been saved in the current session.
+     * Reset to {@code -1L} by {@link #resetSession()} when the user clears
+     * the input or changes the target language.</p>
+     */
+    private long lastHistoryId = -1L;
+
+    /**
+     * The target language code active at the time the current session started.
+     *
+     * <p>Used to detect when the user changes the target language mid-session.
+     * A language change resets the session ({@link #resetSession()}) so the
+     * next translation is INSERTed as a fresh entry rather than UPDATE-ing
+     * the previous language pair's entry.</p>
+     *
+     * <p>{@code null} means no session is active.</p>
+     */
+    @Nullable
+    private String lastSessionTargetLang = null;
+
+	
+	/** Whether online mode (Groq) is active. Defaults to false (offline/ML Kit). */
+    private final MutableLiveData<Boolean> isOnlineModeLiveData = new MutableLiveData<>(false);
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -128,17 +196,21 @@ public class TranslateViewModel extends BaseViewModel {
      * @param addHistoryUseCase     use case for saving to history
      * @param addFavoriteUseCase    use case for adding to favorites
      */
-    public TranslateViewModel(
-            @NonNull TranslateTextUseCase translateTextUseCase,
-            @NonNull DetectLanguageUseCase detectLanguageUseCase,
-            @NonNull AddHistoryUseCase addHistoryUseCase,
-            @NonNull AddFavoriteUseCase addFavoriteUseCase
-    ) {
-        this.translateTextUseCase = translateTextUseCase;
-        this.detectLanguageUseCase = detectLanguageUseCase;
-        this.addHistoryUseCase = addHistoryUseCase;
-        this.addFavoriteUseCase = addFavoriteUseCase;
-    }
+     public TranslateViewModel(
+          @NonNull TranslateTextUseCase translateTextUseCase,
+          @NonNull RemoteTranslateTextUseCase remoteTranslateTextUseCase,
+          @NonNull DetectLanguageUseCase detectLanguageUseCase,
+          @NonNull AddHistoryUseCase addHistoryUseCase,
+          @NonNull UpdateHistoryUseCase updateHistoryUseCase,
+          @NonNull AddFavoriteUseCase addFavoriteUseCase
+     ) {
+          this.translateTextUseCase = translateTextUseCase;
+          this.remoteTranslateTextUseCase = remoteTranslateTextUseCase;
+          this.detectLanguageUseCase = detectLanguageUseCase;
+          this.addHistoryUseCase = addHistoryUseCase;
+          this.updateHistoryUseCase = updateHistoryUseCase;
+          this.addFavoriteUseCase = addFavoriteUseCase;
+     }
 
     // -------------------------------------------------------------------------
     // Public actions
@@ -183,8 +255,11 @@ public class TranslateViewModel extends BaseViewModel {
         // Use MediatorLiveData to safely observe use case result
         // without leaking an unremovable observer via observeForever.
         final MediatorLiveData<Resource<TranslationResult>> mediator = new MediatorLiveData<>();
-        final LiveData<Resource<TranslationResult>> source =
-                translateTextUseCase.execute(sourceText, sourceLang, targetLang);
+        final boolean isOnline = Boolean.TRUE.equals(isOnlineModeLiveData.getValue());
+        FileLogger.d(TAG, "Translation mode: " + (isOnline ? "Online (Groq)" : "Offline (ML Kit)"));
+        final LiveData<Resource<TranslationResult>> source = isOnline
+                ? remoteTranslateTextUseCase.execute(sourceText, sourceLang, targetLang)
+                : translateTextUseCase.execute(sourceText, sourceLang, targetLang);
 
         mediator.addSource(source, resource -> {
             translationResultLiveData.setValue(resource);
@@ -311,12 +386,58 @@ public class TranslateViewModel extends BaseViewModel {
     }
 	
 	/**
-     * Clears the current translation result.
-     * Called when the user taps the Clear button.
+     * Clears the current translation result and resets the translate session.
+     *
+     * <p>Resetting the session means the next translation will INSERT a fresh
+     * history entry instead of updating the previous one. This is the correct
+     * behaviour when the user explicitly clears the input field.</p>
      */
     public void clearTranslation() {
         translationResultLiveData.setValue(null);
         isTranslating = false;
+        resetSession();
+    }
+	
+	/**
+     * Resets only the {@code isTranslating} guard flag without touching
+     * the upsert session state ({@link #lastHistoryId} / {@link #lastSessionTargetLang}).
+     *
+     * <p>Use this instead of {@link #clearTranslation()} when re-triggering
+     * a translation after a mode switch, so the existing history session
+     * entry is updated in-place rather than creating a duplicate.</p>
+     */
+    public void resetTranslatingGuard() {
+        isTranslating = false;
+        FileLogger.d(TAG, "isTranslating guard reset (session preserved).");
+    }
+
+    /**
+     * Restores a history item directly into the result LiveData without
+     * triggering a new translation or saving a new history entry.
+     *
+     * <p>Called when the user taps a history chip or history list item.
+     * The result is displayed immediately as-is.</p>
+     *
+     * @param item the history item to restore; must not be null
+     */
+    public void restoreFromHistory(@NonNull HistoryItem item) {
+        final TranslationResult result = new TranslationResult(
+                item.getSourceText(),
+                item.getTranslatedText(),
+                item.getSourceLanguageCode(),
+                item.getTargetLanguageCode(),
+                item.getTimestamp()
+        );
+        // Restore language pair to match the history item
+        sourceLanguageLiveData.setValue(item.getSourceLanguageCode());
+        targetLanguageLiveData.setValue(item.getTargetLanguageCode());
+        // Publish result directly — no translate, no history write
+        translationResultLiveData.setValue(Resource.success(result));
+        // Sync session so editing this text will UPDATE the existing entry
+        lastHistoryId = item.getId();
+        lastSessionTargetLang = item.getTargetLanguageCode();
+        FileLogger.d(TAG, "Restored from history id=" + item.getId()
+            + " text=" + item.getSourceText());
     }
 	
 	/**
@@ -353,21 +474,77 @@ public class TranslateViewModel extends BaseViewModel {
     // -------------------------------------------------------------------------
 
     /**
-     * Persists the given {@link TranslationResult} to the translation history.
+     * Persists the given {@link TranslationResult} to history using an upsert pattern.
      *
-     * @param result the translation result to save; must not be null
+     * <h3>Session logic</h3>
+     * <ul>
+     *   <li><b>New session</b> ({@link #lastHistoryId} == -1 or target language changed):
+     *       INSERT a new row; store the returned auto-generated ID in
+     *       {@link #lastHistoryId} and record the target language in
+     *       {@link #lastSessionTargetLang}.</li>
+     *   <li><b>Same session</b> ({@link #lastHistoryId} &gt; 0 and target language unchanged):
+     *       UPDATE the existing row with the latest text and timestamp — no new row created.</li>
+     * </ul>
+     *
+     * <p>This replicates Google Translate's history behaviour: however many times
+     * the debounce fires within one editing session, only one history entry is created.</p>
+     *
+     * @param result the translation result to persist; must not be null
      */
     private void saveToHistory(@NonNull TranslationResult result) {
-        final HistoryItem historyItem = new HistoryItem(
-                0L,
-                result.getSourceText(),
-                result.getTranslatedText(),
-                result.getSourceLanguageCode(),
-                result.getTargetLanguageCode(),
-                result.getTimestamp()
-        );
-        addHistoryUseCase.execute(historyItem);
-        FileLogger.d(TAG, "Saved to history: " + result.getSourceText());
+        final String targetLang = result.getTargetLanguageCode();
+
+        // Target language changed → start a new session
+        if (!targetLang.equals(lastSessionTargetLang)) {
+            resetSession();
+        }
+
+        if (lastHistoryId == -1L) {
+            // No entry for this session yet — INSERT and capture the generated id
+            final HistoryItem item = new HistoryItem(
+                    0L,
+                    result.getSourceText(),
+                    result.getTranslatedText(),
+                    result.getSourceLanguageCode(),
+                    targetLang,
+                    result.getTimestamp()
+            );
+            addHistoryUseCase.insertAndGetId(item, generatedId -> {
+                lastHistoryId = generatedId;
+                lastSessionTargetLang = targetLang;
+                FileLogger.d(TAG, "History INSERT id=" + generatedId
+                        + " text=" + result.getSourceText());
+            });
+        } else {
+            // Session already has an entry — UPDATE in-place
+            updateHistoryUseCase.execute(
+                    lastHistoryId,
+                    result.getSourceText(),
+                    result.getTranslatedText(),
+                    result.getSourceLanguageCode(),
+                    result.getTimestamp()
+            );
+            FileLogger.d(TAG, "History UPDATE id=" + lastHistoryId
+                    + " text=" + result.getSourceText());
+        }
+    }
+
+    /**
+     * Resets the current translate session state.
+     *
+     * <p>After this call, the next successful translation will INSERT a fresh
+     * history entry rather than updating the previous session's row.</p>
+     *
+     * <p>Called from:</p>
+     * <ul>
+     *   <li>{@link #clearTranslation()} — user tapped the clear button</li>
+     *   <li>{@link #saveToHistory} — target language changed mid-session</li>
+     * </ul>
+     */
+    private void resetSession() {
+        lastHistoryId = -1L;
+        lastSessionTargetLang = null;
+        FileLogger.d(TAG, "Translate session reset.");
     }
 
     // -------------------------------------------------------------------------
@@ -426,4 +603,14 @@ public class TranslateViewModel extends BaseViewModel {
     public LiveData<Boolean> getAddedToFavoriteLiveData() {
         return addedToFavoriteLiveData;
     }
+	
+	public void setOnlineMode(boolean isOnline) {
+        isOnlineModeLiveData.setValue(isOnline);
+        FileLogger.d(TAG, "Online mode set to: " + isOnline);
+    }
+
+    @NonNull
+     public LiveData<Boolean> getIsOnlineModeLiveData() {
+        return isOnlineModeLiveData;
+     }
 }

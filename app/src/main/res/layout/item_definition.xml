@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_definition.xml
+    A single definition row inside the dictionary result card.
+
+    Design:
+      - Numbered index (e.g. "1.") in primary colour on the left.
+      - Definition text on the right, wrapping to multiple lines.
+      - Optional example sentence below in muted italic style.
+
+    View ID contract (referenced by DefinitionAdapter.java):
+      - textViewIndex      : numbering label e.g. "1."
+      - textViewDefinition : the definition text
+      - textViewExample    : an example sentence (GONE if none available)
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="6dp">
+
+    <!-- Index number -->
+    <TextView
+        android:id="@+id/textViewIndex"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceLabelMedium"
+        android:textColor="?attr/colorPrimary"
+        android:textStyle="bold"
+        tools:text="1." />
+
+    <!-- Definition + example -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewDefinition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurface"
+            tools:text="The occurrence of events by chance in a happy or beneficial way." />
+
+        <TextView
+            android:id="@+id/textViewExample"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textStyle="italic"
+            android:visibility="gone"
+            tools:text="a fortunate stroke of serendipity" 
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</LinearLayout>

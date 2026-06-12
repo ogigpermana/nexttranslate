@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App name -->
     <string name="app_name">NextTranslate</string>
@@ -25,6 +26,11 @@
     <string name="title_favorite">Favorites</string>
     <string name="empty_favorite_title">No favorites yet</string>
     <string name="empty_favorite_subtitle">Tap the bookmark icon after translating to save it here</string>
+	<string name="snackbar_favorite_deleted">Favorite removed</string>
+    <string name="dialog_clear_favorites_title">Clear all favorites</string>
+    <string name="dialog_clear_favorites_message">This will permanently remove all your saved favorites. Continue?</string>
+	<string name="cd_clear_all_favorites">Clear all favorites</string>
+    <string name="menu_clear_all">Clear all</string>
 
     <!-- ======================================================
          fragment_language.xml
@@ -52,5 +58,153 @@
          Shared / common strings
          ====================================================== -->
     <string name="cd_navigate_back">Navigate back</string>
+	
+	<!-- ======================================================
+         Bottom Navigation Menu
+         ====================================================== -->
+	<string name="nav_text">Text</string>
+    <string name="nav_photo">Photo</string>
+    <string name="nav_favorite">Favorite</string>
+    <string name="nav_dialog">Dialog</string>
+	
+	<!-- ======================================================
+         Settings and Collection
+         ====================================================== -->
+	<string name="cd_collection">Open collection</string>
+    <string name="cd_avatar">Profile / Settings</string>
+	<string name="title_collections">Collections</string>
+    <string name="label_my_collections">My Collections</string>
+    <string name="label_dictionary">Dictionary</string>
+    <string name="hint_dictionary_search">Search word...</string>
+    <string name="hint_collection_name">Collection name</string>
+    <string name="label_pick_color">Pick color</string>
+    <string name="label_synonyms">Synonyms</string>
+    <string name="label_antonyms">Antonyms</string>
+    <string name="cd_add_collection">Add collection</string>
+    <string name="cd_search_word">Search word</string>
+    <string name="cd_speak_word">Speak word</string>
+    <string name="empty_collections">No collections yet.\nTap + to create a new collection.</string>
+    <string name="dialog_title_create_collection">Create Collection</string>
+    <string name="dialog_title_rename_collection">Rename</string>
+    <string name="dialog_title_delete_collection">Delete Collection</string>
+    <string name="dialog_msg_delete_collection">Delete collection \"%s\"?</string>
+    <string name="action_create">Create</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_rename">Rename</string>
+    <string name="error_collection_name_empty">Collection name cannot be empty.</string>
+	
+	<string name="label_saved_words">Saved Words</string>
+    <string name="empty_words_in_collection">No words saved yet</string>
+    <string name="cd_delete_word">Delete word</string>
+	
+	<string name="cd_clear_search">Clear search</string>
+	
+	<string name="label_ai_explanation">AI Explanation</string>
+    <string name="btn_explain_with_ai">Explain with AI</string>
+	
+	<!-- ======================================================
+         Photo capture OCR
+         ====================================================== -->
+	<string name="photo_coming_soon">Photo Translation</string>
+	<string name="action_capture">Text detected</string>
 
+    <!-- ======================================================
+         Dialog fragment
+         ====================================================== -->
+	<string name="dialog_user_a_label">User A — Tap mic to speak</string>
+    <string name="dialog_user_b_label">User B — Tap mic to speak</string>
+    <string name="dialog_coming_soon_desc">Two-way interpreter mode.\nComing soon.</string>
+	<string name="lang_indonesian">Indonesian</string>
+    <string name="lang_english">English</string>
+    <string name="dialog_tap_mic_hint">Tap mic to speak…</string>
+	<string name="error_translation_failed">Translation failed. Please try again.</string>
+	<string name="title_dialog_mode">Dialog Mode</string>
+	<string name="action_clear_chat">Clear chat</string>
+	
+	<!-- ======================================================
+         Collection fragment
+         ====================================================== -->
+	<string name="collection_title">Collections</string>
+    <string name="collection_coming_soon">My Collections</string>
+    <string name="collection_coming_soon_desc">Save and organise your favourite translations.\nComing soon.</string>
+    <string name="cd_new_collection">Create new collection</string>
+	
+	<!-- ======================================================
+         Login Activity
+         ====================================================== -->
+	<string name="login_error_google">Google Sign-In failed. Please try again.</string>
+    <string name="login_error_cancelled">Sign-In cancelled.</string>
+    <string name="login_success">Welcome back!</string>
+    <string name="logout_success">Logged out successfully.</string>
+	
+	<string name="login_tagline">Translate anything, anywhere</string>
+    <string name="login_btn_google">Continue with Google</string>
+    <string name="login_btn_guest">Continue as Guest</string>
+	
+	<!-- ======================================================
+         Settings Activity
+         ====================================================== -->
+	<string name="settings_title">Settings</string>
+    <string name="settings_guest_name">Guest User</string>
+    <string name="settings_guest_email">Sign in to sync your data</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_section_translation">Translation</string>
+    <string name="settings_history">Translation History</string>
+    <string name="settings_offline">Offline Mode</string>
+    <string name="settings_language_packs">Download Language Packs</string>
+    <string name="settings_auto_detect">Auto-detect Language</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_rate">Rate on Play Store</string>
+    <string name="settings_feedback">Send Feedback</string>
+    <string name="settings_help">Help &amp; FAQ</string>
+    <string name="settings_logout">Logout</string>
+	
+    <!-- ======================================================
+         Translate Fragment
+         ====================================================== -->
+    <string name="mode_fast">Fast Translation</string>
+    <string name="mode_ai">Translate AI </string>
+    <string name="label_history_arrow">Riwayat</string>
+    <string name="cd_paste">Paste from clipboard</string>
+    <string name="cd_camera">Open camera</string>
+    <string name="cd_mic">Speech to text</string>
+    <string name="cd_clear">Clear input</string>
+    <string name="cd_tts_result">Read translation aloud</string>
+    <string name="cd_more">More options</string>
+
+    <!-- ======================================================
+         bottom_sheet_translate_mode.xml
+         ====================================================== -->
+    <string name="label_select_mode">Select translation mode</string>
+    <string name="mode_fast_sub">Offline · ML Kit</string>
+    <string name="mode_ai_sub">Online · Groq</string>
+    <string name="cd_switch_mode">Toggle translation mode</string>
+	
+	<!-- NetworkUtils error — muncul di Snackbar saat switch Online tanpa internet -->
+    <string name="error_no_internet">There is not internet connection</string>
+	
+	<!-- History screen -->
+    <string name="label_history">History</string>
+    <string name="empty_history">There is no saved history yet</string>
+    <string name="menu_clear_all_history">Delete all</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_history">Open history</string>
+	
+	<!-- History swipe-to-delete Snackbar -->
+    <string name="snackbar_history_deleted">Translation removed</string>
+    <string name="snackbar_undo">Undo</string>
+
+    <!-- Dialog clear history -->
+    <string name="dialog_clear_history_title">Delete all history</string>
+    <string name="dialog_clear_history_message">Are you sure you want to delete all translation history? This action cannot be undone.</string>
+    <string name="dialog_clear_history_confirm">Delete all</string>
+    <string name="dialog_cancel">Cancel</string>
+	
+	<!-- Client ID For Google SSO -->
+	<string name="android_client_id">206837466108-df3s07s5r9s7pii0geb16vsnoseuduul.apps.googleusercontent.com</string>
+	<string name="default_web_client_id">206837466108-ssu5fe3c15fa3mqe810u3o1n4pugkqf7.apps.googleusercontent.com</string>
 </resources>

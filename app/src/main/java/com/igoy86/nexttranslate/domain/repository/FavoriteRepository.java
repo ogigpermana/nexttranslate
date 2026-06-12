@@ -51,4 +51,11 @@ public interface FavoriteRepository {
      * @param id the unique database ID of the favorite entry to delete
      */
     void deleteFavorite(long id);
+	
+	 /**
+     * Deletes all {@link FavoriteItem} entries from the database.
+     *
+     * <p>Executed on a background disk I/O thread.</p>
+     */
+    void clearAllFavorites();
 }

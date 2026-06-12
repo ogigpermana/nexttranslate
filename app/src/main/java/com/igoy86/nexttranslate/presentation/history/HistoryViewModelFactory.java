@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.igoy86.nexttranslate.domain.usecase.history.ClearAllHistoryUseCase;
 import com.igoy86.nexttranslate.domain.usecase.history.DeleteHistoryUseCase;
 import com.igoy86.nexttranslate.domain.usecase.history.GetAllHistoryUseCase;
+import com.igoy86.nexttranslate.domain.usecase.history.RestoreHistoryUseCase;
 import com.igoy86.nexttranslate.util.FileLogger;
 
 /**
@@ -22,7 +23,8 @@ import com.igoy86.nexttranslate.util.FileLogger;
  *     HistoryViewModelFactory factory = new HistoryViewModelFactory(
  *             container.getGetAllHistoryUseCase(),
  *             container.getDeleteHistoryUseCase(),
- *             container.getClearAllHistoryUseCase()
+ *             container.getClearAllHistoryUseCase(),
+ *             container.getRestoreHistoryUseCase()
  *     );
  *
  *     HistoryViewModel viewModel = new ViewModelProvider(this, factory)
@@ -46,6 +48,10 @@ public class HistoryViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     private final ClearAllHistoryUseCase clearAllHistoryUseCase;
 
+    /** Use case for restoring a deleted history entry (Undo swipe-delete). */
+    @NonNull
+    private final RestoreHistoryUseCase restoreHistoryUseCase;
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -57,15 +63,18 @@ public class HistoryViewModelFactory implements ViewModelProvider.Factory {
      * @param getAllHistoryUseCase    use case for retrieving history; must not be null
      * @param deleteHistoryUseCase   use case for deleting a single entry; must not be null
      * @param clearAllHistoryUseCase use case for clearing all entries; must not be null
+     * @param restoreHistoryUseCase  use case for restoring a deleted entry; must not be null
      */
     public HistoryViewModelFactory(
             @NonNull GetAllHistoryUseCase getAllHistoryUseCase,
             @NonNull DeleteHistoryUseCase deleteHistoryUseCase,
-            @NonNull ClearAllHistoryUseCase clearAllHistoryUseCase
+            @NonNull ClearAllHistoryUseCase clearAllHistoryUseCase,
+            @NonNull RestoreHistoryUseCase restoreHistoryUseCase
     ) {
         this.getAllHistoryUseCase = getAllHistoryUseCase;
         this.deleteHistoryUseCase = deleteHistoryUseCase;
         this.clearAllHistoryUseCase = clearAllHistoryUseCase;
+        this.restoreHistoryUseCase = restoreHistoryUseCase;
     }
 
     // -------------------------------------------------------------------------
@@ -95,7 +104,8 @@ public class HistoryViewModelFactory implements ViewModelProvider.Factory {
             return (T) new HistoryViewModel(
                     getAllHistoryUseCase,
                     deleteHistoryUseCase,
-                    clearAllHistoryUseCase
+                    clearAllHistoryUseCase,
+                    restoreHistoryUseCase
             );
         }
         throw new IllegalArgumentException(

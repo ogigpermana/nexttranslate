@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bottom_sheet_save_to_collection.xml
+    Bottom sheet dialog for selecting a collection to save a word into.
+
+    Layout structure:
+      - Root LinearLayout (vertical) — the bottom sheet content container.
+        - Title TextView: "Save to Collection"
+        - RecyclerView: displays the list of user collections with radio-button
+          style selection. Each item shows the collection name and color indicator.
+        - Save MaterialButton: confirms the selection and triggers the insert.
+
+    This layout is inflated programmatically by CollectionFragment and
+    TranslateFragment when the user taps "Save to Collection".
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="16dp"
+    android:paddingBottom="24dp"
+    android:background="?attr/colorSurface">
+
+    <!-- Drag handle indicator -->
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_bottom_sheet_handle"
+        android:alpha="0.4" />
+
+    <!-- Sheet title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        android:text="Save to Collection"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textColor="?attr/colorOnSurface" />
+
+    <!-- Empty state — shown when user has no collections yet -->
+    <TextView
+        android:id="@+id/textEmptyCollections"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="You have no collections yet. Create one from the Collections tab."
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:gravity="center"
+        android:visibility="gone" />
+
+    <!-- Collection list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerSaveToCollection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="280dp"
+        android:nestedScrollingEnabled="false"
+        android:clipToPadding="false"
+        android:paddingHorizontal="8dp" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="?attr/colorOutlineVariant" />
+
+    <!-- Save button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnConfirmSave"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:text="Save" />
+
+</LinearLayout>

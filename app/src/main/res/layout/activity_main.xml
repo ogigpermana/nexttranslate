@@ -1,28 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     activity_main.xml
-    Root layout for MainActivity — the single host Activity of NextTranslate.
+    Root layout for MainActivity.
 
-    Architecture note:
-    This app uses a single-Activity architecture. All screens (TranslateFragment,
-    HistoryFragment, FavoriteFragment, LanguageFragment) are loaded into this
-    FrameLayout container via FragmentManager transactions in MainActivity.java.
+    Design decision:
+      MainActivity does NOT own a toolbar. Each Fragment manages its own
+      toolbar independently. This prevents the double-toolbar issue where
+      both MainActivity's AppBar and TranslateFragment's toolbar were visible.
 
-    Why FrameLayout?
-    A plain FrameLayout is intentional here — it acts as a neutral container
-    for fragment transactions. Toolbar, AppBar, BottomNav, and Snackbar
-    are each managed independently inside their respective Fragments,
-    keeping this host Activity as thin as possible.
+    Structure:
+      - FrameLayout      : full-screen fragment container (edge-to-edge)
+      - BottomNavigationView : pinned to bottom, keyboard-aware via WindowInsets
 
-    Fragment loading order:
-      1. TranslateFragment  — loaded on fresh launch (root, not back-stacked)
-      2. HistoryFragment    — pushed via MainActivity.openHistoryFragment()
-      3. FavoriteFragment   — pushed via MainActivity.openFavoriteFragment()
-      4. LanguageFragment   — pushed via MainActivity.openLanguageFragment()
+    Keyboard behaviour:
+      windowSoftInputMode = adjustResize (in Manifest).
+      BottomNavigationView uses android:fitsSystemWindows="false" so it stays
+      pinned to the bottom and does NOT get pushed up by the soft keyboard.
+      Each Fragment handles its own inset padding for content scrolling.
+
+    Navigation:
+      Fragment swaps are managed by MainActivity.switchTab() and openFragment().
+      TranslateFragment owns the top toolbar (collection icon + title + avatar).
+      Other fragments own their own toolbar (back arrow + title).
 -->
-<FrameLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_container"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true" />
+    android:fitsSystemWindows="false">
+
+    <!--
+        Full-screen fragment container.
+        No AppBarLayout here — each Fragment manages its own toolbar.
+        Fragments handle their own top/bottom inset padding.
+    -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--
+        BottomNavigationView — pinned to bottom of screen.
+        fitsSystemWindows="false" prevents keyboard from pushing it up.
+        WindowInsets for nav bar height handled in MainActivity.initViews().
+    -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:fitsSystemWindows="false"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

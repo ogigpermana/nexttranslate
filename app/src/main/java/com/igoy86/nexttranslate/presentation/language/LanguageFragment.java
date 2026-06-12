@@ -100,6 +100,14 @@ public class LanguageFragment extends BaseFragment<FragmentLanguageBinding> {
         );
         getBinding().recyclerViewLanguages.setAdapter(languageAdapter);
 		
+		androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(
+        getBinding().rootLanguage, (v, insets) -> {
+            final int top = insets.getInsets(
+                    androidx.core.view.WindowInsetsCompat.Type.statusBars()).top;
+            v.setPadding(0, top, 0, 0);
+            return insets;
+        });
+		
 		getBinding().toolbar.setNavigationOnClickListener(v ->
             requireActivity().onBackPressed()
         );

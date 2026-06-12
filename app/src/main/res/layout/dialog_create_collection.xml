@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    dialog_create_collection.xml
+    Dialog layout for creating a new collection or renaming an existing one.
+
+    Contains:
+      - Name input field (TextInputLayout)
+      - Colour picker row (6 preset colour circles, one selected at a time)
+
+    Used by CollectionFragment via AlertDialog.setView().
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <!-- Collection name input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilCollectionName"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_collection_name"
+        android:layout_marginBottom="20dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etCollectionName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:maxLength="40" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Colour picker label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_pick_color"
+        android:textAppearance="?attr/textAppearanceLabelMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="12dp" />
+
+    <!--
+        Colour circles row
+        Each ImageView is a selectable colour preset.
+        Selected state is indicated by a white ring stroke set programmatically
+        in CollectionFragment's dialog setup code.
+    -->
+    <LinearLayout
+        android:id="@+id/layoutColorPicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start"
+        android:layout_marginBottom="8dp">
+
+        <!-- Color 1: Teal -->
+        <ImageView
+            android:id="@+id/colorTeal"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_color_circle"
+            android:backgroundTint="#00897B"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@null"
+            android:tag="#00897B" />
+
+        <!-- Color 2: Blue -->
+        <ImageView
+            android:id="@+id/colorBlue"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_color_circle"
+            android:backgroundTint="#1E88E5"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@null"
+            android:tag="#1E88E5" />
+
+        <!-- Color 3: Purple -->
+        <ImageView
+            android:id="@+id/colorPurple"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_color_circle"
+            android:backgroundTint="#8E24AA"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@null"
+            android:tag="#8E24AA" />
+
+        <!-- Color 4: Red -->
+        <ImageView
+            android:id="@+id/colorRed"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_color_circle"
+            android:backgroundTint="#E53935"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@null"
+            android:tag="#E53935" />
+
+        <!-- Color 5: Orange -->
+        <ImageView
+            android:id="@+id/colorOrange"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_color_circle"
+            android:backgroundTint="#FB8C00"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@null"
+            android:tag="#FB8C00" />
+
+        <!-- Color 6: Green -->
+        <ImageView
+            android:id="@+id/colorGreen"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_color_circle"
+            android:backgroundTint="#43A047"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@null"
+            android:tag="#43A047" />
+
+    </LinearLayout>
+
+</LinearLayout>

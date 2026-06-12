@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_collection_word.xml
+    Layout for a single word entry inside a collection detail screen.
+
+    Design: matches item_history.xml style — no individual card elevation,
+    items sit inside a shared rounded MaterialCardView in the parent layout.
+    Divider drawn via a View at the bottom (same pattern as item_history.xml).
+
+    View ID contract (referenced by CollectionWordAdapter.java):
+      - textViewWord       : the saved word / phrase (bold)
+      - textViewDefinition : short definition or context (secondary text, 2 lines)
+      - textViewAddedAt    : relative timestamp e.g. "2 hari lalu"
+      - btnDeleteWord      : icon button to remove this word from the collection
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootItemCollectionWord"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/colorSurfaceContainer"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <!-- Word + definition column -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="8dp">
+
+            <!-- Saved word / phrase -->
+            <TextView
+                android:id="@+id/textViewWord"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                android:layout_marginBottom="4dp"
+                tools:text="serendipity" />
+
+            <!-- Short definition -->
+            <TextView
+                android:id="@+id/textViewDefinition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                android:textColor="?attr/colorPrimary"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:layout_marginBottom="4dp"
+                tools:text="Finding something good without looking for it." />
+
+            <!-- Relative timestamp -->
+            <TextView
+                android:id="@+id/textViewAddedAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:alpha="0.7"
+                tools:text="2 hari lalu" />
+
+        </LinearLayout>
+
+        <!-- Delete icon button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDeleteWord"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_delete"
+            android:contentDescription="@string/cd_delete_word" />
+
+    </LinearLayout>
+
+    <!-- Divider — same pattern as item_history.xml -->
+    <View
+        android:id="@+id/viewDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/colorOutlineVariant" />
+
+</LinearLayout>

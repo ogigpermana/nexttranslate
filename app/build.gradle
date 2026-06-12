@@ -11,6 +11,14 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        def localProps = new Properties()
+        def localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) {
+            localPropsFile.withInputStream { localProps.load(it) }
+        }
+        buildConfigField "String", "BACKEND_BASE_URL", "\"${localProps['BACKEND_BASE_URL'] ?: ''}\""
+        buildConfigField "String", "APP_TOKEN", "\"${localProps['APP_TOKEN'] ?: ''}\""
     }
 
     buildTypes {
@@ -27,7 +35,11 @@ android {
 
     buildFeatures {
         viewBinding true
-		buildConfig true
+        buildConfig true
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
@@ -56,11 +68,41 @@ dependencies {
     implementation libs.mlkit.translate
     implementation libs.mlkit.langid
 	
-	// Shimmer
+	// CameraX
+    implementation libs.androidx.camera.core
+    implementation libs.androidx.camera.camera2
+    implementation libs.androidx.camera.lifecycle
+    implementation libs.androidx.camera.view
+
+    // ML Kit Text Recognition
+    implementation libs.mlkit.text.recognition
+
+    // Retrofit + Gson
+    implementation libs.retrofit
+    implementation libs.retrofit.gson
+
+    // OkHttp Logging Interceptor
+    implementation libs.okhttp.logging
+	
+	// Android credential
+	implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.auth)
+    implementation(libs.googleid)
+	
+	// DataStore
+	implementation(libs.androidx.datastore)
+	
+	// Glide
+	implementation(libs.glide)
+
+    // Shimmer
     implementation libs.shimmer
 
     // Testing
     testImplementation libs.junit
+    testImplementation libs.mockito.core
+    testImplementation libs.mockito.inline
+    testImplementation libs.androidx.arch.core.testing
     androidTestImplementation libs.androidx.test.junit
     androidTestImplementation libs.androidx.test.espresso
 }

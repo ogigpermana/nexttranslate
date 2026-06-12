@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bg_chip_pos.xml
+    Rounded rectangle background for the part-of-speech label chip
+    (e.g. "noun", "verb") inside the dictionary result card.
+    Uses colorPrimaryContainer so it adapts to light/dark theme.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="?attr/colorPrimaryContainer" />
+
+    <corners android:radius="32dp" />
+
+</shape>

@@ -29,7 +29,8 @@ public class AddHistoryUseCase {
     /**
      * Constructs a new {@link AddHistoryUseCase} with the given repository.
      *
-     * @param historyRepository the repository used to insert history entries
+     * @param historyRepository the repository used to insert history entries;
+     *                          must not be null
      */
     public AddHistoryUseCase(@NonNull HistoryRepository historyRepository) {
         this.historyRepository = historyRepository;
@@ -37,14 +38,35 @@ public class AddHistoryUseCase {
 
     /**
      * Executes the use case by inserting the given {@link HistoryItem}
-     * into the database.
+     * into the database (fire-and-forget, no ID returned).
      *
      * <p>The actual database write is performed on a background disk I/O
-     * thread managed by {@link com.igoy86.nexttranslate.util.AppExecutors}.</p>
+     * thread managed by {@link com.igoy86.nexttranslate.util.AppExecutors}.
+     * This method returns immediately without blocking the caller.</p>
      *
      * @param item the history entry to persist; must not be null
      */
     public void execute(@NonNull HistoryItem item) {
         historyRepository.addHistory(item);
+    }
+
+    /**
+     * Inserts the given {@link HistoryItem} and delivers the auto-generated
+     * row ID via {@code callback} on the disk I/O thread.
+     *
+     * <p>Used by the upsert pattern in {@code TranslateViewModel} to track
+     * the current session's history entry ID for subsequent UPDATE calls via
+     * {@link UpdateHistoryUseCase}. The callback is invoked on a background
+     * thread — the ViewModel posts back to the main thread internally.</p>
+     *
+     * @param item     the history entry to insert; must not be null
+     * @param callback receives the generated ID; invoked on background thread;
+     *                 must not be null
+     */
+    public void insertAndGetId(
+            @NonNull HistoryItem item,
+            @NonNull HistoryRepository.InsertCallback callback
+    ) {
+        historyRepository.insertAndGetId(item, callback);
     }
 }

@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.igoy86.nexttranslate.domain.usecase.favorite.ClearAllFavoritesUseCase;
 import com.igoy86.nexttranslate.domain.usecase.favorite.DeleteFavoriteUseCase;
 import com.igoy86.nexttranslate.domain.usecase.favorite.GetAllFavoritesUseCase;
+import com.igoy86.nexttranslate.domain.usecase.favorite.RestoreFavoriteUseCase;
 import com.igoy86.nexttranslate.util.FileLogger;
-
-/**
+ 
+ /**
  * Factory class responsible for creating instances of {@link FavoriteViewModel}.
  *
  * <p>Provides the required use case dependencies to {@link FavoriteViewModel}
@@ -29,18 +31,9 @@ import com.igoy86.nexttranslate.util.FileLogger;
  */
 public class FavoriteViewModelFactory implements ViewModelProvider.Factory {
 
-    /** Tag used for logging events originating from this factory. */
     private static final String TAG = "FavoriteVMFactory";
-
-    /** Use case for retrieving all favorite translation entries. */
-    @NonNull
-    private final GetAllFavoritesUseCase getAllFavoritesUseCase;
-
-    /** Use case for deleting a single favorite translation entry. */
-    @NonNull
-    private final DeleteFavoriteUseCase deleteFavoriteUseCase;
-
-    // -------------------------------------------------------------------------
+	
+	// -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
 
@@ -51,15 +44,25 @@ public class FavoriteViewModelFactory implements ViewModelProvider.Factory {
      * @param getAllFavoritesUseCase use case for retrieving favorites; must not be null
      * @param deleteFavoriteUseCase use case for deleting a single entry; must not be null
      */
+
+    @NonNull private final GetAllFavoritesUseCase getAllFavoritesUseCase;
+    @NonNull private final DeleteFavoriteUseCase deleteFavoriteUseCase;
+    @NonNull private final RestoreFavoriteUseCase restoreFavoriteUseCase;
+    @NonNull private final ClearAllFavoritesUseCase clearAllFavoritesUseCase;
+
     public FavoriteViewModelFactory(
             @NonNull GetAllFavoritesUseCase getAllFavoritesUseCase,
-            @NonNull DeleteFavoriteUseCase deleteFavoriteUseCase
+            @NonNull DeleteFavoriteUseCase deleteFavoriteUseCase,
+            @NonNull RestoreFavoriteUseCase restoreFavoriteUseCase,
+            @NonNull ClearAllFavoritesUseCase clearAllFavoritesUseCase
     ) {
         this.getAllFavoritesUseCase = getAllFavoritesUseCase;
         this.deleteFavoriteUseCase = deleteFavoriteUseCase;
+        this.restoreFavoriteUseCase = restoreFavoriteUseCase;
+        this.clearAllFavoritesUseCase = clearAllFavoritesUseCase;
     }
-
-    // -------------------------------------------------------------------------
+	
+	// -------------------------------------------------------------------------
     // ViewModelProvider.Factory implementation
     // -------------------------------------------------------------------------
 
@@ -76,21 +79,21 @@ public class FavoriteViewModelFactory implements ViewModelProvider.Factory {
      * @throws IllegalArgumentException if {@code modelClass} is not
      *                                  {@link FavoriteViewModel}
      */
+
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(FavoriteViewModel.class)) {
             FileLogger.d(TAG, "Creating FavoriteViewModel instance.");
-
             //noinspection unchecked
             return (T) new FavoriteViewModel(
                     getAllFavoritesUseCase,
-                    deleteFavoriteUseCase
+                    deleteFavoriteUseCase,
+                    restoreFavoriteUseCase,
+                    clearAllFavoritesUseCase
             );
         }
         throw new IllegalArgumentException(
-                "FavoriteViewModelFactory cannot create an instance of: "
-                        + modelClass.getName()
-        );
+                "FavoriteViewModelFactory cannot create: " + modelClass.getName());
     }
 }

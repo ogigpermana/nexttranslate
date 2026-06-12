@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bg_color_circle.xml
+    Solid oval used as the colour picker circles in dialog_create_collection.xml.
+    The actual fill colour is set via android:backgroundTint on each ImageView,
+    so this drawable just defines the oval shape.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <solid android:color="#FFFFFFFF" />
+
+</shape>

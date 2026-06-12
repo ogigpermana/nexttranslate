@@ -23,13 +23,34 @@ room = "2.8.4"
 mlkit-translate = "17.0.3"
 mlkit-langid = "17.0.6"
 
+# CameraX
+camerax = "1.4.2"
+
+# ML Kit Text Recognition
+mlkit-text-recognition = "16.0.1"
+
 # Shimmer
 shimmer = "0.5.0"
+
+# Retrofit - OkHttp
+retrofit = "2.11.0"
+okhttp = "4.12.0"
+
+# Google Identity / Credential Manager
+credentials = "1.3.0"
+googleid = "1.1.1"
+datastore = "1.1.1"
+
+# Glide
+glide = "4.16.0"
 
 # Testing
 junit = "4.13.2"
 androidx-junit = "1.3.0"
 espresso = "3.7.0"
+mockito = "5.14.2"
+mockito-inline = "5.2.0"
+arch-core = "2.2.0"
 
 [libraries]
 # AndroidX Core
@@ -56,13 +77,41 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 mlkit-translate = { group = "com.google.mlkit", name = "translate", version.ref = "mlkit-translate" }
 mlkit-langid = { group = "com.google.mlkit", name = "language-id", version.ref = "mlkit-langid" }
 	
+# CameraX
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
+
+# ML Kit Text Recognition
+mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkit-text-recognition" }
+	
 # Shimmer
 shimmer = { group = "com.facebook.shimmer", name = "shimmer", version.ref = "shimmer" }
+	
+# Retrofit - OkHttp
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+	
+# Google Identity / Credential Manager
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+	
+# DataStore
+androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+	
+# Glide
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
 androidx-test-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockito-inline" }
+androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "arch-core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
